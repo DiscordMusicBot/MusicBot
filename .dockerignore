@@ -1,10 +1,7 @@
 # Runtime
-audio_cache/
 bin/
 data/
 logs/
-musicbot/__pycache__/
-musicbot/lib/__pycache__/
 
 # Docker
 .dockerignore
@@ -23,4 +20,4 @@ Dockerfile
 circle.yml
 
 # Misc
-.pylintrc
+
