@@ -1,4 +1,4 @@
 discord.py[voice] ~= 0.16.11
-youtube_dl == 2017.09.11
+youtube_dl == 2017.09.24
 colorlog ~= 3.0.1
 pynacl ~= 1.1.2
