@@ -18,6 +18,7 @@ from websockets.exceptions import InvalidState
 from .utils import avg, format_time_ffmpeg
 from .lib.event_emitter import EventEmitter
 from .constructs import Serializable, Serializer
+from .entry import URLPlaylistEntry
 from .exceptions import FFmpegError, FFmpegWarning
 
 LOG = logging.getLogger(__name__)
@@ -571,8 +572,13 @@ class Player(EventEmitter, Serializable):
     def progress(self):
         """ TODO """
         if self._current_player:
-            return round(self._current_player.buff.frame_count * 0.02) + \
+            if isinstance(self._current_entry, URLPlaylistEntry):
+                 ret = round(self._current_player.buff.frame_count * 0.02) + \
                 (self.current_entry.start_seconds if self.current_entry is not None else 0)
+            else:
+                ret = 0
+        
+            return ret
             # TODO: Properly implement this
             #       Correct calculation should be bytes_read/192k
             #       192k AKA sampleRate * (bitDepth / 8) * channelCount

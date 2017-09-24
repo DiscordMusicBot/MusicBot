@@ -2568,32 +2568,34 @@ class MusicBot(discord.Client):
         Forward <timestamp> into the current entry
         E.g. 01:10
         """
+        if isinstance(player.current_entry, StreamPlaylistEntry):
+            return Response("It is not possible to forward a STREAM!", delete_after=20)
+        else:
+            parts = timestamp.split(":")
+            if len(parts) < 1:  # Shouldn't occur, but who knows?
+                return Response("Please provide a valid timestamp!", delete_after=20)
 
-        parts = timestamp.split(":")
-        if len(parts) < 1:  # Shouldn't occur, but who knows?
-            return Response("Please provide a valid timestamp!", delete_after=20)
+            # seconds, minutes, hours, days
+            values = (1, 60, 60 * 60, 60 * 60 * 24)
 
-        # seconds, minutes, hours, days
-        values = (1, 60, 60 * 60, 60 * 60 * 24)
+            secs = 0
+            for i in range(len(parts)):
+                try:
+                    v = int(parts[i])
+                except:
+                    continue
 
-        secs = 0
-        for i in range(len(parts)):
-            try:
-                v = int(parts[i])
-            except:
-                continue
+                j = len(parts) - i - 1
+                if j >= len(values):  # If I don't have a conversion from this to seconds
+                    continue
 
-            j = len(parts) - i - 1
-            if j >= len(values):  # If I don't have a conversion from this to seconds
-                continue
+                secs += v * values[j]
 
-            secs += v * values[j]
+            if player.current_entry is None:
+                return Response("Nothing playing!", delete_after=20)
 
-        if player.current_entry is None:
-            return Response("Nothing playing!", delete_after=20)
-
-        if not player.goto_seconds(player.progress + secs):
-            return Response("Timestamp exceeds song duration!", delete_after=20)
+            if not player.goto_seconds(player.progress + secs):
+                return Response("Timestamp exceeds song duration!", delete_after=20)
 
     async def cmd_rwd(self, player, timestamp):
         """
@@ -2603,32 +2605,34 @@ class MusicBot(discord.Client):
         Rewind <timestamp> into the current entry
         E.g. 01:10
         """
+        if isinstance(player.current_entry, StreamPlaylistEntry):
+            return Response("It is not possible to rewind a STREAM!", delete_after=20)
+        else:
+            parts = timestamp.split(":")
+            if len(parts) < 1:  # Shouldn't occur, but who knows?
+                return Response("Please provide a valid timestamp!", delete_after=20)
 
-        parts = timestamp.split(":")
-        if len(parts) < 1:  # Shouldn't occur, but who knows?
-            return Response("Please provide a valid timestamp!", delete_after=20)
+            # seconds, minutes, hours, days
+            values = (1, 60, 60 * 60, 60 * 60 * 24)
 
-        # seconds, minutes, hours, days
-        values = (1, 60, 60 * 60, 60 * 60 * 24)
+            secs = 0
+            for i in range(len(parts)):
+                try:
+                    v = int(parts[i])
+                except:
+                    continue
 
-        secs = 0
-        for i in range(len(parts)):
-            try:
-                v = int(parts[i])
-            except:
-                continue
+                j = len(parts) - i - 1
+                if j >= len(values):  # If I don't have a conversion from this to seconds
+                    continue
 
-            j = len(parts) - i - 1
-            if j >= len(values):  # If I don't have a conversion from this to seconds
-                continue
+                secs += v * values[j]
 
-            secs += v * values[j]
+            if player.current_entry is None:
+                return Response("Nothing playing!", delete_after=20)
 
-        if player.current_entry is None:
-            return Response("Nothing playing!", delete_after=20)
-
-        if not player.goto_seconds(player.progress - secs):
-            return Response("Timestamp exceeds song duration!", delete_after=20)
+            if not player.goto_seconds(player.progress - secs):
+                return Response("Timestamp exceeds song duration!", delete_after=20)
 
 
     async def cmd_volume(self,
