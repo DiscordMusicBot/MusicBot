@@ -314,10 +314,11 @@ class MusicBot(discord.Client):
                     if self.config.auto_playlist and not \
                             player.playlist.entries:
                         await self.on_player_finished_playing(player)
-                        if self.config.auto_pause:
-                            player.once('play',
-                                        lambda player,
-                                               **_: _autopause(player))
+
+                    if self.config.auto_pause:
+                        player.once('play',
+                                    lambda player,
+                                           **_: _autopause(player))
 
                 except Exception:
                     LOG.debug(
