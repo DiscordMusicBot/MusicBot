@@ -198,7 +198,8 @@ class VoiceStateUpdate:
         """ TODO """
         return all((
             self.my_voice_channel,
-            self.voice_channel == self.my_voice_channel
+            self.voice_channel == self.my_voice_channel or \
+                    self.old_voice_channel == self.my_voice_channel
         ))
 
     @property
