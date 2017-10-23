@@ -240,6 +240,12 @@ class URLPlaylistEntry(BasePlaylistEntry):
                     if expected_fname_base in ldir:
                         self.filename = os.path.join(
                             self.download_folder, expected_fname_base)
+                        img_pattern = re.compile(
+                                r'({}\.(jpg|jpeg|png|gif|bmp))$'.format(
+                                    expected_fname_noex), flags=re.IGNORECASE)
+                        self.filename_thumbnail = next(
+                                os.path.join(self.download_folder, f)
+                                for f in os.listdir(self.download_folder) if img_pattern.search(f))
                         LOG.info('Download cached: %s', self.url)
 
                     elif expected_fname_noex in flistdir:
@@ -291,7 +297,8 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
         # Search for file name with an image suffix
         img_pattern = re.compile(
-            r'(\.(jpg|jpeg|png|gif|bmp))$', flags=re.IGNORECASE)
+            r'({}\.(jpg|jpeg|png|gif|bmp))$'.format(
+                os.path.basename(self.filename).rsplit('.', 1)[0]), flags=re.IGNORECASE)
         self.filename_thumbnail = next(
             os.path.join(self.download_folder, f)
             for f in os.listdir(self.download_folder) if img_pattern.search(f))

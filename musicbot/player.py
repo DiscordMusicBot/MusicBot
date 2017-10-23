@@ -123,7 +123,7 @@ class Player(EventEmitter, Serializable):
         self.loop = bot.loop
         self.voice_client = voice_client
         self.playlist = playlist
-        self.deliberately_killed = False
+        self.prevent_playback = False
         self.state = PlayerState.STOPPED
         self.skip_state = None
         self._volume = bot.config.default_volume
@@ -248,14 +248,10 @@ class Player(EventEmitter, Serializable):
         self._kill_current_player()
 
     def _playback_finished(self):
-        entry = self._current_entry
-        self._previous_entry = entry
-        self._current_entry = None
-        self._current_player = None
-
-        if self.deliberately_killed:
-            self.deliberately_killed = False
+        if self.prevent_playback:
+            self.prevent_playback = False
             return
+        entry = self._current_entry
 
         if self.is_repeat_all or (self.is_repeat_single and not self.skip_repeat):
             self.playlist._add_entry(entry)
@@ -413,8 +409,9 @@ class Player(EventEmitter, Serializable):
         """
 
         with await self._play_lock:
+            # Prevent the _playback_finished after killed ffmpeg_player
+            self.prevent_playback = True
             # In-case there was a player, kill it. RIP.
-            self.deliberately_killed = True
             self._kill_current_player()
 
             self._current_player = self._monkeypatch_player(self.voice_client.create_ffmpeg_player(
