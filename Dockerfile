@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM alpine:edge
 
 LABEL maintainer "TBK <tbk@jjtc.eu>"
 
