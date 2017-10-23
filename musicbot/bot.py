@@ -739,9 +739,8 @@ class MusicBot(discord.Client):
         channel = entry.meta.get('channel', None)
         author = entry.meta.get('author', None)
         thumbnail = entry.filename_thumbnail
-
-        if channel and author:
-            if self.config.now_playing_mentions:
+        if channel:
+            if self.config.now_playing_mentions and author:
                 newmsg = "%s - your song **%s** is now playing in %s!" % (
                     entry.meta['author'].mention,
                     entry.title,
@@ -764,6 +763,7 @@ class MusicBot(discord.Client):
                 self.server_data[channel.server]['last_np_msg'] = \
                     await self.safe_send_message(channel, newmsg)
 
+
     # TODO: Check channel voice state?
     async def on_player_resume(self, player, entry, **_):
         """ TODO """
@@ -783,18 +783,17 @@ class MusicBot(discord.Client):
         # Played song message deletion
         entry = player.previous_entry
         if entry is not None:
+            # only need channel
             channel = entry.meta.get('channel', None)
-            author = entry.meta.get('author', None)
-
-            if channel and author:
+            
+            if channel:
                 last_np_msg = \
                     self.server_data[channel.server]['last_np_msg']
+                # Remove first then delete
+                # Because on_player_play will be faster than delete
+                self.server_data[channel.server]['last_np_msg'] = None
                 if last_np_msg and last_np_msg.channel == channel:
-                    async for lmsg in self.logs_from(channel, limit=1):
-                        if lmsg != last_np_msg and last_np_msg:
-                            await self.safe_delete_message(last_np_msg)
-                            self.server_data[channel.server]['last_np_msg'] = None
-                        break  # This is probably redundant
+                    await self.safe_delete_message(last_np_msg)
 
         # Auto playlist add song
         if not player.playlist.entries and not player.current_entry and \
@@ -851,8 +850,16 @@ class MusicBot(discord.Client):
                 # player.current_entry and self.config.auto_playlist)
 
                 try:
+                    # Get bound text channel in player server
+                    channel = None
+                    for c in player.voice_client.server.channels:
+                        if self.config.bound_channels and c.id in \
+                                self.config.bound_channels:
+                            channel = c
+                            break
+                            
                     await player.playlist.add_entry(
-                        song_url, channel=None, author=None)
+                        song_url, channel=channel, author=None)
                 except exceptions.ExtractionError as error:
                     LOG.error(
                         "Error adding song from autoplaylist: %s", error)
@@ -2573,7 +2580,7 @@ class MusicBot(discord.Client):
             return Response("It is not possible to forward a STREAM!", delete_after=20)
         else:
             parts = timestamp.split(":")
-            if len(parts) < 1:  # Shouldn't occur, but who knows?
+            if len(parts) <= 1:  # Shouldn't occur, but who knows?
                 return Response("Please provide a valid timestamp!", delete_after=20)
 
             # seconds, minutes, hours, days
@@ -2610,7 +2617,7 @@ class MusicBot(discord.Client):
             return Response("It is not possible to rewind a STREAM!", delete_after=20)
         else:
             parts = timestamp.split(":")
-            if len(parts) < 1:  # Shouldn't occur, but who knows?
+            if len(parts) <= 1:  # Shouldn't occur, but who knows?
                 return Response("Please provide a valid timestamp!", delete_after=20)
 
             # seconds, minutes, hours, days
