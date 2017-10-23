@@ -13,13 +13,13 @@ Find the correct instruction on the [Wiki](https://github.com/DiscordMusicBot/Mu
 
 
 ### Commands
-Commands are listed [here](https://github.com/DiscordMusicBot/MusicBot/wiki/Commands "Commands list").
+Commands list [here](https://github.com/DiscordMusicBot/MusicBot/wiki/Commands "Commands list")
 
 
 ### Configuration
 The main configuration file is called `config/config.ini` and the permissions file is called `config/permissions.ini` by default they do not exist.
 
-Read the following Wiki pages to on how to create them:
+Read the following Wiki pages on how to create them:
 - [Configurations](https://github.com/DiscordMusicBot/MusicBot/wiki/Configuration)
 - [Permissions](https://github.com/DiscordMusicBot/MusicBot/wiki/Permissions)
 
